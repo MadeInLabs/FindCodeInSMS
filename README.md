@@ -1,5 +1,7 @@
 # FindCodeInSMS
 
+This is not a lib, just a example of simple code to get patterns from incoming SMS.
+
 While app is running, send a message that contains the text 'code [foo]', where [foo] is a number with 6 digits.
 
 The [foo] and sender number appears in the screen. If other message comes, the text is appended to the other.
