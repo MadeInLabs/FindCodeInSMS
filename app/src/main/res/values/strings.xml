@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Find Code In SMS</string>
+    <string name="request_receive_sms_permission_explanation">É necessário permissão para detectar o código enviado por SMS.</string>
+    <string name="ok">ok</string>
+    <string name="function_explanation">Receive a SMS with some text with \'code: [foo]\', where [foo] is the code that you want get</string>
+    <string name="phone_number_code">%1$s sent: %2$s\n</string>
+</resources>

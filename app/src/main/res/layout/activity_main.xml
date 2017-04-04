@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="br.com.luisfelipeas5.findcodeinsms.MainActivity">
+
+    <ImageView android:id="@+id/img_background"
+        android:contentDescription="@string/app_name"
+        android:visibility="invisible"
+        android:src="@color/colorAccent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <TextView android:id="@+id/txt_explanation"
+        android:textStyle="bold"
+        android:padding="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/function_explanation"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v4.widget.NestedScrollView android:id="@+id/nested_scroll_view"
+        android:padding="16dp"
+        android:layout_below="@id/txt_explanation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView android:id="@+id/txt_code"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </android.support.v4.widget.NestedScrollView>
+
+</RelativeLayout>
