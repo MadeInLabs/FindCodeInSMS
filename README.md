@@ -77,15 +77,20 @@ When onReceive() method is called, we read the sender number and message of the 
 BroadcastReceiver smsReceiver = new BroadcastReceiver() {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Bundle bundle = intent.getExtras();
-        if (bundle != null) {
-            Object[] pdus = (Object[]) bundle.get("pdus");
-            if (pdus != null) {
-                for (Object pdu : pdus) {
-                    SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdu);
-                    String phoneNumber = currentMessage.getOriginatingAddress();
-                    String message = currentMessage.getMessageBody();
-                    showCode(phoneNumber, message);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            SmsMessage[] messagesFromIntent = Telephony.Sms.Intents.getMessagesFromIntent(intent);
+            for (SmsMessage smsMessage : messagesFromIntent) {
+                showCode(smsMessage);
+            }
+        }else {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                Object[] pdus = (Object[]) bundle.get("pdus");
+                if (pdus != null) {
+                    for (Object pdu : pdus) {
+                        SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdu);
+                        showCode(currentMessage);
+                    }
                 }
             }
         }
@@ -103,5 +108,19 @@ registerReceiver(smsReceiver, filter);
 
 ## Find the pattern inside the SMS
 
+With a regex and the class [Pattern](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html) of java, we looking for the pattern 'code: [foo]' in the text, where [foo] is a decimal with six digits.
 
-
+```java
+private void showCode(String phoneNumber, String message) {
+        if (message == null) {
+            return;
+        }
+        Pattern pattern = Pattern.compile("code: (\\d{6})");
+        Matcher matcher = pattern.matcher(message);
+        if (matcher.find()) {
+            String code = matcher.group(1);
+            TextView txtCode = (TextView) findViewById(R.id.txt_code);
+            txtCode.append(getString(R.string.phone_number_code, phoneNumber, code));
+        }
+}
+```
