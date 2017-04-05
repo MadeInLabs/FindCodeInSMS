@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -78,15 +79,20 @@ public class MainActivity extends AppCompatActivity {
         BroadcastReceiver smsReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Bundle bundle = intent.getExtras();
-                if (bundle != null) {
-                    Object[] pdus = (Object[]) bundle.get("pdus");
-                    if (pdus != null) {
-                        for (Object pdu : pdus) {
-                            SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdu);
-                            String phoneNumber = currentMessage.getOriginatingAddress();
-                            String message = currentMessage.getMessageBody();
-                            showCode(phoneNumber, message);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    SmsMessage[] messagesFromIntent = Telephony.Sms.Intents.getMessagesFromIntent(intent);
+                    for (SmsMessage smsMessage : messagesFromIntent) {
+                        showCode(smsMessage);
+                    }
+                }else {
+                    Bundle bundle = intent.getExtras();
+                    if (bundle != null) {
+                        Object[] pdus = (Object[]) bundle.get("pdus");
+                        if (pdus != null) {
+                            for (Object pdu : pdus) {
+                                SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdu);
+                                showCode(currentMessage);
+                            }
                         }
                     }
                 }
@@ -94,6 +100,10 @@ public class MainActivity extends AppCompatActivity {
         };
         IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
         registerReceiver(smsReceiver, filter);
+    }
+
+    private void showCode(SmsMessage smsMessage) {
+        showCode(smsMessage.getOriginatingAddress(), smsMessage.getMessageBody());
     }
 
     private void showCode(String phoneNumber, String message) {
