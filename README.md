@@ -21,7 +21,7 @@ Add the user permission in [Android Manifest](app/src/main/AndroidManifest.xml):
 <uses-permission android:name="android.permission.RECEIVE_SMS" />
 ```
 
-And request permission at run time (for more details access the [Android Developer Guide](https://developer.android.com/training/permissions/requesting.html?hl=pt-br)) like done in the [MainActivity](app/src/main/java/br/com/luisfelipeas5/findcodeinsms/MainActivity.java). In this part of the code, we first check if the user already gave the permission, if didn't, we request, otherwise the other steps are executed:
+And request permission at run time (for more details access the [Android Developer Guide](https://developer.android.com/training/permissions/requesting.html?hl=pt-br)) like done in the onCreate() method of [MainActivity](app/src/main/java/br/com/luisfelipeas5/findcodeinsms/MainActivity.java). In this part of the code, we first check if the user already gave the permission, if didn't, we request, otherwise the other steps are executed:
 ```java
 int receiveSMSPermissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS);
 int readSMSPermissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS);
@@ -68,3 +68,40 @@ public void onRequestPermissionsResult(int requestCode, @NonNull String[] permis
 ```
 
 ## Create and register the Receiver
+
+To listen SMS received by the device, we have to create a BroadcastReceiver (what is this? Take a look to this [guide of Android Developers](https://developer.android.com/guide/components/broadcasts.html)). We did this in the [MainActivity](app/src/main/java/br/com/luisfelipeas5/findcodeinsms/MainActivity.java) on the method startBroadcastReceiver().
+
+When onReceive() method is called, we read the sender number and message of the SMS that was inside the intent parameter. After that, the next steps will detect some code inside the message.
+
+```java
+BroadcastReceiver smsReceiver = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            Object[] pdus = (Object[]) bundle.get("pdus");
+            if (pdus != null) {
+                for (Object pdu : pdus) {
+                    SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdu);
+                    String phoneNumber = currentMessage.getOriginatingAddress();
+                    String message = currentMessage.getMessageBody();
+                    showCode(phoneNumber, message);
+                }
+            }
+        }
+    }
+};
+```
+
+It was created as an anonymous subclass of BroadcastReceiver abstract class because it is a easy way to modify the UI of this activity.
+
+To this BroadcastReceiver works, we have to register it as a receiver of SMS received, using android.provider.Telephony.SMS_RECEIVED as a intent filter(watch out with the captilized 'T'):
+```java
+IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+registerReceiver(smsReceiver, filter);
+```
+
+## Find the pattern inside the SMS
+
+
+
